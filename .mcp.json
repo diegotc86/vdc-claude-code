@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ticketflow-db": {
+      "command": "npx",
+      "args": ["tsx", "mcp/ticketflow-db/server.ts"],
+      "env": {
+        "DATABASE_URL": "postgres://ticketflow:ticketflow@localhost:5433/ticketflow"
+      }
+    }
+  }
+}

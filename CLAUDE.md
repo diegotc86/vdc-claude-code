@@ -33,6 +33,15 @@ mode in `web/`.
 - Support staff can be `active = false` (soft delete). Any query joining `agents`
   must decide explicitly how to treat inactive staff.
 
+## Data
+
+- Schema truth: `mcp__ticketflow-db__describe_table` (read-only MCP server), or
+  `server/migrations/` read in order. Don't guess column names.
+- Soft deletes are `active` flags, not row deletion. Seeded dev data: 40 tickets,
+  4 customers, 5 agents — **2 of them inactive**, and some tickets are assigned
+  to those.
+- `_migrations` is bookkeeping for `db:migrate`; never write to it by hand.
+
 ## Architecture
 
 - `server/src/routes/` HTTP only · `server/src/services/` data access ·

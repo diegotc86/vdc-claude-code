@@ -57,7 +57,7 @@ main ──► ex01-claude-md ──► ex02-hooks ──► ex03-skills ──�
 | `ex01-claude-md` | `CLAUDE.md` y `web/CLAUDE.md` | `git diff main ex01-claude-md` |
 | `ex02-hooks` | `.claude/settings.json` (hooks + permisos) y `.claude/hooks/*.sh` | `git diff ex01-claude-md ex02-hooks` |
 | `ex03-skills` | `.claude/skills/new-endpoint/` y `.claude/commands/*.md` | `git diff ex02-hooks ex03-skills` |
-| `demos` | `.mcp.json` + `mcp/ticketflow-db/`, `.claude/agents/`, workflow de CI, `HARNESS.md` | `git diff ex03-skills demos` |
+| `demos` | `.mcp.json` + `mcp/ticketflow-db/`, `.claude/agents/`, workflow de CI, `HARNESS.md` y [`DEMOS.md`](DEMOS.md) (la chuleta de comandos del bloque 5) | `git diff ex03-skills demos` |
 
 El harness completo construido en vivo:
 

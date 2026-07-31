@@ -18,7 +18,10 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git checkout *)",
-      "Bash(git worktree *)"
+      "Bash(git worktree *)",
+      "mcp__ticketflow-db__list_tables",
+      "mcp__ticketflow-db__describe_table",
+      "mcp__ticketflow-db__query"
     ],
     "ask": [
       "Bash(npm run db:migrate*)",

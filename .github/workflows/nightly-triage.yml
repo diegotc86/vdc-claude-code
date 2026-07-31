@@ -1,0 +1,71 @@
+# Nightly test run + agent triage on failure.
+#
+# The point of this file: everything built in the exercises — CLAUDE.md, hooks,
+# permission rules, skills — loads identically here. That is the payoff of
+# putting the harness in files instead of in your habits.
+#
+# Requires ANTHROPIC_API_KEY in the repo secrets.
+name: nightly-triage
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run typecheck --workspace server
+      - run: npm run lint --workspace server
+      - run: npm test
+
+  triage:
+    needs: test
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm install -g @anthropic-ai/claude-code
+      # The prompt lives in a versioned, reviewable FILE — not inline YAML.
+      # Bounded (--max-turns), and the runner is already a disposable container
+      # with only the secrets we granted: containment for free. Deny rules in
+      # .claude/settings.json still bind, even in bypass mode.
+      - name: Claude triage
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "$(cat .claude/prompts/nightly-triage.md)" \
+            --output-format json \
+            --max-turns 40 \
+            --dangerously-skip-permissions \
+            | tee triage-result.json
+      # The agent opens a PR; it never pushes to main. Review per outcome.
+      - name: Open PR if a fix branch exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="fix/nightly-$(date +%F)"
+          if git rev-parse --verify "$BRANCH" >/dev/null 2>&1; then
+            git push origin "$BRANCH"
+            gh pr create --head "$BRANCH" \
+              --title "Nightly triage: automated fix $(date +%F)" \
+              --body "Automated fix from nightly triage. Review required — do not auto-merge."
+          fi
+      - name: Upload triage artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: triage
+          path: |
+            triage-result.json
+            triage-report.md
+          if-no-files-found: ignore
