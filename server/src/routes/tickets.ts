@@ -22,13 +22,24 @@ ticketsRouter.get("/", async (req, res) => {
     res.status(400).json({ error: "invalid status" });
     return;
   }
+  const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+  const offset = parseInt(req.query.offset as string) || 0;
+
+  const countResult = status
+    ? await query("SELECT COUNT(*) FROM tickets WHERE status = $1", [status])
+    : await query("SELECT COUNT(*) FROM tickets");
+  const total = parseInt(countResult.rows[0].count);
+
   const rows = status
     ? await query(
-        "SELECT * FROM tickets WHERE status = $1 ORDER BY created_at DESC",
+        `SELECT * FROM tickets WHERE status = $1 ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`,
         [status],
       )
-    : await query("SELECT * FROM tickets ORDER BY created_at DESC");
-  res.json(rows.rows);
+    : await query(
+        `SELECT * FROM tickets ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`,
+      );
+
+  res.json({ data: rows.rows, total, limit, offset });
 });
 
 ticketsRouter.get("/:id", async (req, res) => {
