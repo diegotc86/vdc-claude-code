@@ -17,11 +17,12 @@ mode in `web/`.
 - Request validation: zod schemas — `routes/customers.ts` is the canonical
   example. The manual checks in `routes/tickets.ts` are the old style; do not
   imitate. Parameterized SQL only (`$1, $2, …`), never string interpolation.
-- Migrations: `server/migrations/NNN-description.sql`, strictly sequential, never
-  edit an applied migration. Enum-like columns get CHECK constraints; new FK
-  columns get indexes; use TIMESTAMPTZ.
+- Migrations: `server/migrations/NNN-description.sql`, strictly sequential; never
+  edit an applied migration (a hook enforces this). Column-level conventions live
+  in `/review-migration` — run it on every migration you write.
 - API responses: raw rows today. **Do not invent envelope formats** — `web/app/api.ts`
   consumes these shapes and TypeScript will not catch the break.
+- Adding or substantially changing an endpoint? Load the `new-endpoint` skill.
 
 ## Traps
 

@@ -1,0 +1,49 @@
+// Template: a new-resource router following Ticketflow conventions.
+// Replace `widget` with your resource, then register it in src/index.ts.
+import { Router } from "express";
+import { z } from "zod";
+import * as widgetService from "../services/widgetService.js";
+
+export const widgetsRouter = Router();
+
+const createWidgetSchema = z.object({
+  name: z.string().min(1).max(200),
+});
+
+const listWidgetsQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+widgetsRouter.get("/", async (req, res) => {
+  const parsed = listWidgetsQuery.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  // Raw array, no envelope.
+  res.json(await widgetService.listWidgets(parsed.data));
+});
+
+widgetsRouter.get("/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "invalid id" });
+    return;
+  }
+  const widget = await widgetService.getWidget(id);
+  if (!widget) {
+    res.status(404).json({ error: "not found" });
+    return;
+  }
+  res.json(widget);
+});
+
+widgetsRouter.post("/", async (req, res) => {
+  const parsed = createWidgetSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  res.status(201).json(await widgetService.createWidget(parsed.data));
+});
