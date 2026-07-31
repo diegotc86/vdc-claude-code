@@ -1,0 +1,17 @@
+# Ticketflow backlog
+
+Tareas abiertas de la app. Están escritas como las escribiría un compañero de
+equipo: **imperfectamente**. Parte del trabajo es notar cuándo un fallo del
+agente fue en realidad un fallo de especificación de la tarea.
+
+| #   | Tarea                                                                                                                                                                                                                | Uso en el workshop                                            |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| T1  | Add pagination to `GET /api/tickets` (limit/offset, default 20, max 100). Include total count in the response.                                                                                                        | La medición: baseline y re-corrida con CLAUDE.md (bloques 1–2) |
+| T2  | Bug: a closed ticket can be set back to `open` via `PATCH /api/tickets/:id`. Closed tickets must only transition to `open` through the reopen flow (`POST /api/tickets/:id/reopen`), which must record `reopened_at`. | Vehículo del Stop gate (bloque 3)                             |
+| T3  | Add a `priority` field to tickets (`low` / `normal` / `high` / `urgent`, default `normal`): migration, API validation, include in responses, filter support (`?priority=`).                                           | Tarea: `/review-migration`                                    |
+| T4  | Add `GET /api/customers/:id/tickets` returning that customer's tickets, newest first.                                                                                                                                 | Prueba de la skill `new-endpoint` (bloque 4)                  |
+| T5  | Refactor: `routes/tickets.ts` still contains raw SQL. Move all data access into `ticketService.ts` without changing behavior.                                                                                         | Tarea: subagentes y orquestación                              |
+| T6  | Bug report from support: "Ticket #23 shows the wrong assignee in the UI, and a few others look wrong too." Nobody knows which others.                                                                                 | Demo de MCP (bloque 5) — el código está bien, los datos no    |
+| T7  | Add tags to tickets: `tags` table + `ticket_tags` join table, endpoints to add/remove tags, filter `?tag=`.                                                                                                           | Tarea: calibrar permisos, worktrees                           |
+| T8  | The status-transition rules in `ticketService.ts` have no direct unit tests. Add a table-driven test covering every legal and illegal transition.                                                                     | Le da dientes al Stop gate                                    |
+| T9  | Nightly CI should triage any failing tests: identify the cause, and open a PR with a fix if it's mechanical.                                                                                                          | Demo de headless + CI (bloque 5)                              |
